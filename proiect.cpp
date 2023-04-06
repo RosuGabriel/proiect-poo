@@ -11,7 +11,7 @@ int main()
     z.add_animal(Animal(3, "capibara", "Gogu"));
     z.add_animal(Animal(90, "testoasa", "Mara"));
     z.add_animal(Animal(15, "crocodil", "Croc"));
-
+    std::cin >> z; // adauga bani si mancare gradinii
   
     z.angajare(Ingrijitor(32, "Ciobotaru", "Mitica"));
 
