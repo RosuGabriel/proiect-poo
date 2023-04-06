@@ -166,11 +166,11 @@ ostream& operator << (ostream& out, const Zoo& z) {
 };
 
 istream& operator >> (istream& in, Zoo& z) {
-    cout << "Adaugare bani la zoo:";
+    cout << "Adaugare bani la " << z.nume << ": ";
     int x;
     cin >> x;
     z.profit_bilete = z.profit_bilete + x;
-    cout << "Adaugare mancare la zoo:";
+    cout << "Adaugare mancare la " << z.nume << ": ";
     cin >> x;
     z.hrana = z.hrana + x;
     return in;
