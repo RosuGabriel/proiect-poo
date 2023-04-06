@@ -104,6 +104,7 @@ public:
     };
 
     friend ostream& operator << (ostream& out, const Zoo& z);
+    friend istream& operator >> (istream& in, Zoo& z);
 
     void add_animal(Animal x) {
         a.push(x);
@@ -162,6 +163,17 @@ ostream& operator << (ostream& out, const Zoo& z) {
     out << "Nr.animale: " << z.nr_animale << '\n';
     out << "Animale:\n" << z.a;
     return out;
+};
+
+istream& operator >> (istream& in, Zoo& z) {
+    cout << "Adaugare bani la zoo:";
+    int x;
+    cin >> x;
+    z.profit_bilete = z.profit_bilete + x;
+    cout << "Adaugare mancare la zoo:";
+    cin >> x;
+    z.hrana = z.hrana + x;
+    return in;
 };
 
 #endif
