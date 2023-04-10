@@ -15,7 +15,7 @@ Tema aleasă: Gradina Zoo
  
 O listă cu funcționalitățile
   <br />*in proiect.cpp este main-ul unde dau exemplu de functionalitati.
-    <br />- Zoo z("Bio Parco di Roma"); apeleeaza constructorul pentru zoo, ca paramentru are doar denumirea | toate se initializeaza cu 30kg de mancare si nici un animal.
+    <br />- Zoo z("Bio Parco di Roma"); apeleaza constructorul pentru zoo, ca paramentru are doar denumirea | toate se initializeaza cu 30kg de mancare si nici un animal.
     <br />- z.add_animal(Animal(3, "capibara", "Gogu")); metoda din clasa Zoo cu constructorul de animal ca parametru | primeste varsta, specia si numele animalului pe care il baga in vectorul de animale gradinii respective.
     <br />- z.angajare(Ingrijitor(32, "Ciobotaru", "Mitica")); metoda din clasa Zoo cu constructorul de animal ca parametru | primeste varsta, numele si prenumele angajatului pe care il baga in vectorul de ingrijitori gradinii respective.
     <br />- z.buy_bilet("adult", 2); metoda din clasa Zoo cu constructorul de bilet si numarul de bilete cumparate ca parametrii | se inmulteste cantitatea cu pretul biletului si se adauga la profitul din clasa Zoo
