@@ -34,6 +34,7 @@ public:
 
 
 class Animal {
+protected:
     int varsta;
     MyString nume;
     MyString specie;
@@ -63,14 +64,31 @@ ostream& operator << (ostream& out, const Animal& a) {
 //---------------------------------------------------------------
 
 
-class Ingrijitor {
+class AnimalCarnivor : public Animal {
+public:
+    AnimalCarnivor(int v = 0, const char* spc = "none", const char* num = "no name") : Animal(v, spc, num) {};
+};
+
+
+//---------------------------------------------------------------
+
+
+class AnimalErbivor : public Animal {
+public:
+    AnimalErbivor(int v = 0, const char* spc = "none", const char* num = "no name") : Animal(v, spc, num) {};
+};
+
+
+//---------------------------------------------------------------
+
+
+class Angajat {
+protected:
     int varsta;
     MyString nume;
     MyString prenume;
 
-public:
-
-    Ingrijitor(int v = 18, const char* num = "no name", const char* pre = "no name") {
+    Angajat(int v = 18, const char* num = "no name", const char* pre = "no name") {
         varsta = v;
         prenume = pre;
         nume = num;
@@ -85,12 +103,38 @@ public:
 //---------------------------------------------------------------
 
 
+class Ingrijitor : public Angajat
+{
+
+public:
+
+    Ingrijitor(int v = 18, const char* num = "no name", const char* pre = "no name") : Angajat(v, num, pre) {};
+
+};
+
+
+//---------------------------------------------------------------
+
+
+class Casier : public Angajat
+{
+public:
+    Casier(int v = 18, const char* num = "no name", const char* pre = "no name") : Angajat(v, num, pre) {
+
+    }
+};
+
+
+//---------------------------------------------------------------
+
+
 class Zoo {
-    int nr_animale, nr_vizitatori, nr_ingrijitori;
+    int nr_animale, nr_vizitatori, nr_ingrijitori, nr_casieri;
     double profit_bilete, hrana;
     MyString nume;
     Vector<Animal> a;
     Vector<Ingrijitor> i;
+    Vector<Casier> c;
 public:
 
     Zoo(const char* num = "no name") {
@@ -99,6 +143,7 @@ public:
         nr_vizitatori = 0;
         profit_bilete = 0;
         nr_ingrijitori = 0;
+        nr_casieri = 0;
         nume = num;
         cout << '\n' << nume << " s-a deschis\n\n";
     };
@@ -153,13 +198,20 @@ public:
         i.push(j);
         nr_ingrijitori++;
     }
+
+    void angajare(Casier j) {
+        c.push(j);
+        nr_casieri++;
+    }
 };
 
 ostream& operator << (ostream& out, const Zoo& z) {
     out << "Nume Zoo: " << z.nume << '\n';
     out << "Ingrijitori: " << z.nr_ingrijitori << '\n';
+    out << "Casieri: " << z.nr_casieri << '\n';
     out << "Nr. vizitatori: " << z.nr_vizitatori << '\n';
-    out << "Bani din bilete : " << z.profit_bilete << '\n';
+    out << "Cantitate mancare: " << z.hrana << " kg\n";
+    out << "Bani din bilete : " << z.profit_bilete << " lei\n";
     out << "Nr.animale: " << z.nr_animale << '\n';
     out << "Animale:\n" << z.a;
     return out;
@@ -175,5 +227,6 @@ istream& operator >> (istream& in, Zoo& z) {
     z.hrana = z.hrana + x;
     return in;
 };
+
 
 #endif
