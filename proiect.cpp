@@ -2,18 +2,8 @@
 #include "structuri.hpp"
 #include "clase.hpp"
 
-
-//class MyException : public std::exception
-//{
-//
-//};
-
 int main()
 {
-    
-    //dynamic_cast<>
-
-
     Zoo z("Bio Parco di Roma");
 
     z.add_animal(AnimalErbivor(2, "panda", "Po"));
@@ -21,23 +11,43 @@ int main()
     //z.add_animal(AnimalErbivor(90, "testoasa", "Mara"));
     z.add_animal(AnimalCarnivor(15, "crocodil", "Croc"));
     
-  
-    z.angajare(Ingrijitor(32, "Ciobotaru", "Mitica"));
+   
+    
+    Ingrijitor c(27, "Bogdan", "Dracea");
+    z.angajare(c);
+    
+    Ingrijitor g(39, "Viorel", "Dragu");
+    z.angajare(g);
 
-    z.buy_bilet(Bilet("adult"), 2);
-    //z.buy_bilet("student", 1);
+    //z.buy_bilet(Bilet("adult"), 2);
+    z.buy_bilet(Bilet(), 1);
 
-    //z.buy_mancare(30);
+    z.buy_mancare(300);
 
     z.feed_animals();
-    z.angajare(Casier(22, "Ciocan", "Marius"));
+
+    Casier c2(36, "Alexandru", "Toma");
+    z.angajare(c2);
+
+    Ingrijitor g2(32, "Maria", "Popovici");
+    z.angajare(g2);
 
     Zoo x("Vienna ZOO");
     x.add_animal(AnimalErbivor(5, "strut", "Bubi"));
-    x.angajare(Ingrijitor(54, "Ion", "Ionut"));
     x.feed_animals();
+    Casier c1(40, "Costel", "Bojog");
+    x.angajare(c1);
 
-    std::cout << '\n' << z << x;
+
+    Ingrijitor g1(41, "Claudiu", "Teohari");
+    x.angajare(g1);
+
+    z.PrezentareAngajati();
+    x.PrezentareAngajati();
+    
+
+    z.PrimulCasier();
+
 
     return 0;
 }

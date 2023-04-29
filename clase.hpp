@@ -2,7 +2,25 @@
 #define clase_hpp
 
 #include "structuri.hpp"
+#include <exception>
+#include <vector>
+#include <string>
+
 using namespace std;
+
+
+//---------------------------------------------------------------
+
+
+class MyException : public std::exception {
+private:
+    string message;
+public:
+    MyException(const string& msg) : message(msg) {}
+    virtual const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
 
 
 //---------------------------------------------------------------
@@ -10,18 +28,32 @@ using namespace std;
 
 class Bilet {
     int pret;
-    MyString persoana;// copil student adult etc
+    string persoana;// copil student adult etc
 public:
     Bilet(const char* p = "invalid") {
-        persoana = p;
         pret = 0;
-        if (p == "adult") {
-            pret = 30;
-        }
-        else
-            if (p == "copil" || p == "pensionar" || p == "student" || p == "elev") {
-                pret = 17;
+        try {
+            if (p == "invalid")
+                throw MyException("Bilet invalid!");
+            persoana = p;
+            pret = 0;
+            if (p == "adult") {
+                pret = 30;
             }
+            else
+                if (p == "copil" || p == "pensionar" || p == "student" || p == "elev") {
+                    pret = 17;
+                }
+        }
+        catch(const MyException& e){
+            cerr << "Eroare: " << e.what() << " - Nu este specificat tipul de bilet! - A fost selectat default bilet adult.\n";
+            pret = 30;
+            persoana = "adult";
+        }
+    }
+
+    string cine() {
+        return persoana;
     }
 
     int cost() {
@@ -48,10 +80,9 @@ public:
 
     friend ostream& operator << (ostream& out, const Animal& a);
 
-    MyString who() { //getter nume
+    MyString who() {
         return nume;
     };
-
 
 };
 
@@ -76,6 +107,7 @@ public:
 class AnimalErbivor : public Animal {
 public:
     AnimalErbivor(int v = 0, const char* spc = "none", const char* num = "no name") : Animal(v, spc, num) {};
+    
 };
 
 
@@ -85,18 +117,20 @@ public:
 class Angajat {
 protected:
     int varsta;
-    MyString nume;
-    MyString prenume;
-
+    string nume;
+    string prenume;
+public:
     Angajat(int v = 18, const char* num = "no name", const char* pre = "no name") {
+        if (v < 18)
+            throw logic_error("Angajatul trebuie sa fie major");
         varsta = v;
         prenume = pre;
         nume = num;
     };
 
-    void prezentare() {
-        cout << varsta << nume << prenume;
-    };
+    virtual void prezentare() = 0;
+
+    virtual ~Angajat() { cout << nume << " destructor angajat\n"; }
 };
 
 
@@ -110,6 +144,11 @@ public:
 
     Ingrijitor(int v = 18, const char* num = "no name", const char* pre = "no name") : Angajat(v, num, pre) {};
 
+    void prezentare() override {
+        cout << "Ingrijitorul " << nume << " " << prenume << " are " << varsta << " ani\n";
+    }
+
+    ~Ingrijitor()  { cout << nume << " Ingrijitorul si-a incheiat tura\n"; }
 };
 
 
@@ -119,25 +158,52 @@ public:
 class Casier : public Angajat
 {
 public:
-    Casier(int v = 18, const char* num = "no name", const char* pre = "no name") : Angajat(v, num, pre) {
+    Casier(int v = 18, const char* num = "no name", const char* pre = "no name") : Angajat(v, num, pre) {};
 
-    }
+    void prezentare() override {
+        cout << "Casierul " << nume << " " << prenume << " are " << varsta << " ani\n";
+    };
+
+    ~Casier()  { cout << nume << " Casierul si-a incheiat tura\n"; }
 };
 
 
 //---------------------------------------------------------------
 
 
-class Zoo {
+class FoodMarket
+{
+public:
+    virtual void buy_mancare(double p) = 0;
+};
+
+
+//---------------------------------------------------------------
+
+
+class HR
+{
+public:
+    virtual void angajare(Ingrijitor &x) = 0;
+    virtual void angajare(Casier &x) = 0;
+};
+
+
+//---------------------------------------------------------------
+
+
+class Zoo : public FoodMarket, public HR {
+    static int NrZoo;
+    static int BileteVandute;
     int nr_animale, nr_vizitatori, nr_ingrijitori, nr_casieri;
     double profit_bilete, hrana;
     MyString nume;
     Vector<Animal> a;
-    Vector<Ingrijitor> i;
-    Vector<Casier> c;
+    vector<Angajat*> angajati;
 public:
 
     Zoo(const char* num = "no name") {
+        NrZoo++;
         hrana = 30; //kg
         nr_animale = 0;
         nr_vizitatori = 0;
@@ -147,6 +213,16 @@ public:
         nume = num;
         cout << '\n' << nume << " s-a deschis\n\n";
     };
+
+    static int getNrZoo()
+    {
+        return NrZoo;
+    }
+
+    static int getNrBilete()
+    {
+        return BileteVandute;
+    }
 
     friend ostream& operator << (ostream& out, const Zoo& z);
     friend istream& operator >> (istream& in, Zoo& z);
@@ -162,48 +238,104 @@ public:
     }
 
     void feed_animals() {
-        if (hrana >= a.ASKsize() * 10 && nr_ingrijitori > 0) {
-            cout << "la " << nume << ":\n";
-            for (int i = 0; i < a.ASKsize(); i++) {
-                cout << a.get(i).who() << " a fost hranit\n";
-                hrana = hrana - 10;
-            }
+        try
+        {
+            if (hrana < a.ASKsize() * 10)
+                throw MyException("Nu este suficienta hrana pentru animalele din gradina zoologica!");
+            if (nr_ingrijitori == 0)
+                throw MyException("Nu exista niciun ingrijitor in gradina zoo!");
+            cout << nume << " - Animalele au fost hranite!\n";
         }
-        else {
-            if (nr_ingrijitori > 0)
-                cout << "Nu exista destula mancare pentru animale!\n";
-            else
-                cout << "Nu exista angajati care sa hraneasca animalele!\n";
+        catch (const MyException& e)
+        {
+            std::cerr << "Eroare: " << nume << " - " << e.what() << '\n';
+            try {
+                if (e.what()[4]=='s' && (nr_ingrijitori == 0))
+                    throw MyException("Nu exista niciun ingrijitor in gradina zoo!");
+                if (e.what()[4]=='x' && hrana < a.ASKsize() * 10)
+                    throw MyException("Nu este suficienta hrana pentru animalele din gradina zoologica!");
+            }
+            catch (const MyException& x) {
+                std::cerr << "Inca o Eroare: " << nume << " - " << x.what() << '\n';
+            }
         }
     }
 
     void buy_mancare(double p) {
-        if (p > profit_bilete)
-            cout << "Nu exista bani pentru hrana!\n";
-        else
+        try
         {
-            profit_bilete = profit_bilete - p;
-            hrana = hrana + p * 0.5;
-            cout << '\n' << nume << " a cumparat " << p * 0.5 << "kg de mancare\n";
+            if (p > profit_bilete)
+                throw MyException("Nu sunt fonduri pentru mancare!");
+            profit_bilete -= p;
+            hrana += p / 2;
+            cout << '\n' << nume << " a cumparat " << p / 2 << "kg de mancare\n";
+        }
+        catch (const MyException& e)
+        {
+            std::cerr << "Eroare: " << nume << " - " << e.what() << '\n';
         }
 
     }
 
     void buy_bilet(Bilet y, int n) {
-        nr_vizitatori = nr_vizitatori + n;
-        profit_bilete = profit_bilete + n * y.cost();
+        if (n == 0)
+            throw MyException("Trebuie cumparat minim un bilet");
+       
+        if (y.cine()[0] != 'i') {
+            BileteVandute += n;
+            nr_vizitatori = nr_vizitatori + n;
+            profit_bilete = profit_bilete + n * y.cost();
+        }
     }
 
-    void angajare(Ingrijitor j) {
-        i.push(j);
+    void angajare(Ingrijitor &j) override {
+        angajati.push_back(&j);
         nr_ingrijitori++;
     }
 
-    void angajare(Casier j) {
-        c.push(j);
+    void angajare(Casier &j) override {
+        angajati.push_back(&j);
         nr_casieri++;
     }
+    
+    void PrezentareAngajati() { 
+        cout << '\n' << nume << " are urmatorii angajati:\n";
+        for (int i = 0; i < angajati.size(); i++) {
+            angajati[i]->prezentare();
+        };
+    }
+
+    void PrimulCasier() {
+        for (int i = 0; i < angajati.size(); i++) {
+            Casier* c = dynamic_cast<Casier*>(angajati[i]);
+            if (c != nullptr) {
+                std::cout << "Downcasting successful!" << '\n' << "Primul casier angajat la " << nume << " este: ";
+                c->prezentare();
+                break;
+            }
+            else {
+                std::cout << "Downcasting failed!" << '\n';
+            }
+        };
+    }
+
+    void PrimulIngrijitor() {
+        for (int i = 0; i < angajati.size(); i++) {
+            Ingrijitor* c = dynamic_cast<Ingrijitor*>(angajati[i]);
+            if (c != nullptr) {
+                std::cout << "Downcasting successful!" << '\n' << "Primul ingrijitor angajat la " << nume << " este: ";
+                c->prezentare();
+                break;
+            }
+            else {
+                std::cout << "Downcasting failed!" << '\n';
+            }
+        };
+    }
 };
+
+int Zoo::NrZoo = 0;
+int Zoo::BileteVandute = 0;
 
 ostream& operator << (ostream& out, const Zoo& z) {
     out << "Nume Zoo: " << z.nume << '\n';
