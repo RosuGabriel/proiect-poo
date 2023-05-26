@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <algorithm>
 #include "structuri.hpp"
 #include "clase.hpp"
 
@@ -16,7 +17,7 @@ int main()
     Ingrijitor c(27, "Bogdan", "Dracea");
     z.angajare(c);
     
-    Ingrijitor g(39, "Viorel", "Dragu");
+    Ingrijitor g(19, "Viorel", "Dragu");
     z.angajare(g);
 
     //z.buy_bilet(Bilet("adult"), 2);
@@ -48,6 +49,10 @@ int main()
 
     z.PrimulCasier();
 
+    std::cout << "profitul mai mare:" << myMax(z.bani(), x.bani()) << '\n';
+
+    z.sortAngajatiByVarsta();
+   
 
     return 0;
 }

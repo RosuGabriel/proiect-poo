@@ -5,6 +5,9 @@
 #include <exception>
 #include <vector>
 #include <string>
+#include <memory>
+#include <chrono>
+#include <ctime>
 
 using namespace std;
 
@@ -84,6 +87,10 @@ public:
         return nume;
     };
 
+    bool operator== (const Animal& c)
+    {
+        return (varsta == c.varsta);
+    }
 };
 
 ostream& operator << (ostream& out, const Animal& a) {
@@ -130,6 +137,18 @@ public:
 
     virtual void prezentare() = 0;
 
+    bool operator == (const Angajat& other ) {
+        return (varsta == other.varsta);
+    }
+
+    bool operator < (const Angajat& other) {
+        return (varsta < other.varsta);
+    }
+
+    bool operator > (const Angajat& other) {
+        return (varsta > other.varsta);
+    }
+
     virtual ~Angajat() { cout << nume << " destructor angajat\n"; }
 };
 
@@ -146,6 +165,18 @@ public:
 
     void prezentare() override {
         cout << "Ingrijitorul " << nume << " " << prenume << " are " << varsta << " ani\n";
+    }
+
+    bool operator== (const Ingrijitor& other) {
+        return (varsta == other.varsta);
+    }
+
+    bool operator< (const Ingrijitor& other) {
+        return (varsta < other.varsta);
+    }
+
+    bool operator> (const Ingrijitor& other) {
+        return (varsta > other.varsta);
     }
 
     ~Ingrijitor()  { cout << nume << " Ingrijitorul si-a incheiat tura\n"; }
@@ -234,31 +265,45 @@ public:
     };
 
     ~Zoo() {
+        NrZoo--;
         cout << '\n' << nume << " s-a inchis\n";
     }
 
     void feed_animals() {
-        try
-        {
-            if (hrana < a.ASKsize() * 10)
-                throw MyException("Nu este suficienta hrana pentru animalele din gradina zoologica!");
-            if (nr_ingrijitori == 0)
-                throw MyException("Nu exista niciun ingrijitor in gradina zoo!");
-            cout << nume << " - Animalele au fost hranite!\n";
-        }
-        catch (const MyException& e)
-        {
-            std::cerr << "Eroare: " << nume << " - " << e.what() << '\n';
+        auto now = chrono::system_clock::now();
+        time_t current_time = chrono::system_clock::to_time_t(now);
+
+        struct std::tm local_time;
+        localtime_s(&local_time, &current_time);
+
+        if (local_time.tm_hour >= 10 && local_time.tm_hour < 12) {
             try {
-                if (e.what()[4]=='s' && (nr_ingrijitori == 0))
-                    throw MyException("Nu exista niciun ingrijitor in gradina zoo!");
-                if (e.what()[4]=='x' && hrana < a.ASKsize() * 10)
+                if (hrana < a.ASKsize() * 10)
                     throw MyException("Nu este suficienta hrana pentru animalele din gradina zoologica!");
+                if (nr_ingrijitori == 0)
+                    throw MyException("Nu exista niciun ingrijitor in gradina zoo!");
+                cout << nume << " - Animalele au fost hranite!\n";
             }
-            catch (const MyException& x) {
-                std::cerr << "Inca o Eroare: " << nume << " - " << x.what() << '\n';
+            catch (const MyException& e) {
+                std::cerr << "Eroare: " << nume << " - " << e.what() << '\n';
+                try {
+                    if (e.what()[4] == 's' && (nr_ingrijitori == 0))
+                        throw MyException("Nu exista niciun ingrijitor in gradina zoo!");
+                    if (e.what()[4] == 'x' && hrana < a.ASKsize() * 10)
+                        throw MyException("Nu este suficienta hrana pentru animalele din gradina zoologica!");
+                }
+                catch (const MyException& x) {
+                    std::cerr << "Inca o Eroare: " << nume << " - " << x.what() << '\n';
+                }
             }
         }
+        else
+            cout << "\n!! in afara programului de hranire !!\n";
+    }
+
+
+    double bani() {
+        return profit_bilete;
     }
 
     void buy_mancare(double p) {
@@ -278,6 +323,14 @@ public:
     }
 
     void buy_bilet(Bilet y, int n) {
+
+        if (nr_vizitatori == 0)
+        {
+            unique_ptr<int> Primul = std::make_unique<int>(y.cost());
+            cout << "Pretul primului bilet cumparat azi e de " << *Primul << " lei\n";
+        }
+
+
         if (n == 0)
             throw MyException("Trebuie cumparat minim un bilet");
        
@@ -332,7 +385,23 @@ public:
             }
         };
     }
+
+    void sortAngajatiByVarsta() {
+        std::sort(angajati.begin(), angajati.end(), [](Angajat* a, Angajat* b) 
+            {
+            return *a < *b;
+            });
+        cout << "cel mai tanar angajat de la " << nume << "este ";
+        angajati[0]->prezentare();
+    }
+
+
 };
+
+template <typename T> T myMax(T x, T y)
+{
+    return (x > y) ? x : y;
+}
 
 int Zoo::NrZoo = 0;
 int Zoo::BileteVandute = 0;
